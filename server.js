@@ -84,24 +84,46 @@ const allowedOrigins = (process.env.CLIENT_ORIGINS || '')
 
 const corsOrigins = allowedOrigins.length > 0 ? allowedOrigins : defaultOrigins;
 
-app.use(
+const corsOptions = {
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  maxAge: 86400,
+};
+
+app.use((req, res, next) => {
+  const requestHost = req.headers.host;
+
   cors({
+    ...corsOptions,
     origin(origin, callback) {
       // Requests without an Origin header (curl, Postman, server-to-server)
-      // are allowed. Browser origins must be explicitly listed.
-      if (!origin || corsOrigins.includes(origin)) {
+      // are allowed.
+      if (!origin) {
         return callback(null, true);
       }
+
+      // Allow explicitly listed frontend origins.
+      if (corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      // Allow same-origin requests such as the built-in API dashboard,
+      // even when Vercel serves the app from a deployment-specific URL.
+      try {
+        if (requestHost && new URL(origin).host === requestHost) {
+          return callback(null, true);
+        }
+      } catch (_error) {
+        // Invalid origins fall through to the CORS rejection below.
+      }
+
       const error = new Error('Not allowed by CORS');
       error.status = 403;
       return callback(error);
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-    maxAge: 86400,
-  })
-);
+  })(req, res, next);
+});
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
