@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Testing dashboard for the ENSTA WAMD TD-TP 3 e-commerce REST API: JWT authentication, product management and rate limiting."
+    />
+    <title>WAMD Commerce - API Console</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230f172a'/%3E%3Cpath d='M7 9h10l.8 9H6.2L7 9Z' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3Cpath d='M9.5 9V7.5a2.5 2.5 0 0 1 5 0V9' fill='none' stroke='%23fff' stroke-width='1.5'/%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <!-- Inline SVG icon system: no external icon dependency, no emojis. -->
+    <svg class="icon-sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <symbol id="i-bag" viewBox="0 0 24 24">
+        <path d="M5.5 8.5h13l1 12h-15l1-12Z" />
+        <path d="M9 8.5V6.75A3.25 3.25 0 0 1 12.25 3.5h-.5A3.25 3.25 0 0 1 15 6.75V8.5" />
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24">
+        <rect x="4" y="10" width="16" height="10.5" rx="2.5" />
+        <path d="M8 10V7.5a4 4 0 0 1 8 0V10" />
+        <path d="M12 14.2v2.4" />
+      </symbol>
+      <symbol id="i-key" viewBox="0 0 24 24">
+        <circle cx="8" cy="12" r="4" />
+        <path d="M12 12h8.5M17 12v3M20 12v2" />
+      </symbol>
+      <symbol id="i-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="8" r="3.5" />
+        <path d="M5 20c.7-3.5 3.4-5.5 7-5.5s6.3 2 7 5.5" />
+      </symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24">
+        <rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
+        <path d="m4.5 7.5 7.5 5.5 7.5-5.5" />
+      </symbol>
+      <symbol id="i-refresh" viewBox="0 0 24 24">
+        <path d="M20 11a8 8 0 0 0-14.7-4.2L3.5 9" />
+        <path d="M3.5 4.5V9H8" />
+        <path d="M4 13a8 8 0 0 0 14.7 4.2l1.8-2.2" />
+        <path d="M20.5 19.5V15H16" />
+      </symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24">
+        <path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l.8 13h9.4l.8-13" />
+        <path d="M10.2 10.5v6M13.8 10.5v6" />
+      </symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24">
+        <path d="M4 20h4l10.3-10.3a2.4 2.4 0 0 0-3.4-3.4L4.6 16.6 4 20Z" />
+        <path d="m13.7 7.5 3.4 3.4" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="6" />
+        <path d="m15 15 4.5 4.5" />
+      </symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24">
+        <path d="M12 5v14M5 12h14" />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12.5 4.2 4.2L19 7" />
+      </symbol>
+      <symbol id="i-warning" viewBox="0 0 24 24">
+        <path d="M12 3.8 21 20H3L12 3.8Z" />
+        <path d="M12 9v4.5M12 16.8v.2" />
+      </symbol>
+      <symbol id="i-activity" viewBox="0 0 24 24">
+        <path d="M3 12h4l2.2-5.5 4.1 11 2.2-5.5H21" />
+      </symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4" />
+      </symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24">
+        <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.4 8.4 0 1 0 10.2 10.2Z" />
+      </symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24">
+        <rect x="8.5" y="8.5" width="11" height="11" rx="2.5" />
+        <path d="M15.5 8.5v-2a2.5 2.5 0 0 0-2.5-2.5H7a2.5 2.5 0 0 0-2.5 2.5V13a2.5 2.5 0 0 0 2.5 2.5h2" />
+      </symbol>
+      <symbol id="i-shield" viewBox="0 0 24 24">
+        <path d="M12 3.2 19.5 6v5.6c0 4.2-2.8 7.5-7.5 9.2-4.7-1.7-7.5-5-7.5-9.2V6L12 3.2Z" />
+        <path d="m8.8 11.8 2.2 2.2 4.2-4.2" />
+      </symbol>
+      <symbol id="i-gauge" viewBox="0 0 24 24">
+        <path d="M4 17a8.5 8.5 0 1 1 16 0" />
+        <path d="m12 14 3.5-4.2" />
+        <circle cx="12" cy="14" r="1.2" />
+      </symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="8.5" />
+        <path d="M12 7.5V12l3 2" />
+      </symbol>
+      <symbol id="i-x" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M18 6 6 18" />
+      </symbol>
+      <symbol id="i-database" viewBox="0 0 24 24">
+        <ellipse cx="12" cy="6" rx="8" ry="3" />
+        <path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6" />
+        <path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6" />
+      </symbol>
+      <symbol id="i-code" viewBox="0 0 24 24">
+        <path d="m8 8-4 4 4 4M16 8l4 4-4 4M14 5l-4 14" />
+      </symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24">
+        <path d="M14 5h4.5A1.5 1.5 0 0 1 20 6.5v11a1.5 1.5 0 0 1-1.5 1.5H14" />
+        <path d="M10 8l-4 4 4 4M6 12h9" />
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24">
+        <path d="m8 5.5 10 6.5-10 6.5v-13Z" />
+      </symbol>
+      <symbol id="i-stop" viewBox="0 0 24 24">
+        <rect x="6.5" y="6.5" width="11" height="11" rx="1.5" />
+      </symbol>
+      <symbol id="i-rotate" viewBox="0 0 24 24">
+        <path d="M4 5v5h5" />
+        <path d="M4.6 10A8 8 0 1 1 5 15" />
+      </symbol>
+      <symbol id="i-image" viewBox="0 0 24 24">
+        <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+        <circle cx="9" cy="9.5" r="1.5" />
+        <path d="m4.5 17 4.7-4.6 3.1 3 3-2.8 4.2 4.4" />
+      </symbol>
+      <symbol id="i-external" viewBox="0 0 24 24">
+        <path d="M14 4.5h5.5V10M19 5l-8 8" />
+        <path d="M18.5 14v4.5a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 18.5V7a1.5 1.5 0 0 1 1.5-1.5H10" />
+      </symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24">
+        <path d="M2.8 12S6 6.5 12 6.5 21.2 12 21.2 12 18 17.5 12 17.5 2.8 12 2.8 12Z" />
+        <circle cx="12" cy="12" r="2.8" />
+      </symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24">
+        <path d="M4 4l16 16" />
+        <path d="M9.9 5.1A9.8 9.8 0 0 1 12 4.9c6 0 9.2 5.5 9.2 5.5a16.7 16.7 0 0 1-2.4 3.1" />
+        <path d="M6.2 7A17 17 0 0 0 2.8 10.4S6 15.9 12 15.9a9.8 9.8 0 0 0 3.7-.7" />
+        <path d="M10.2 10.3a2.5 2.5 0 0 0 3.5 3.5" />
+      </symbol>
+    </svg>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark">
+            <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
+          </span>
+          <div class="brand-text">
+            <strong>WAMD Commerce</strong>
+            <span>ENSTA WAMD - TD-TP 3 API console</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <span class="status-pill" id="apiStatus" role="status" aria-live="polite">
+            <span class="status-dot"></span>
+            <span id="apiStatusText">Checking API</span>
+          </span>
+          <button class="icon-button" id="themeToggle" type="button" aria-label="Switch to dark theme">
+            <svg class="icon icon-sun" aria-hidden="true"><use href="#i-sun"></use></svg>
+            <svg class="icon icon-moon" aria-hidden="true"><use href="#i-moon"></use></svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard">
+        <!-- ------------------------------------------------------------------ -->
+        <!-- Authentication                                                     -->
+        <!-- ------------------------------------------------------------------ -->
+        <section class="card auth-card" aria-labelledby="authTitle">
+          <div class="card-head">
+            <div class="card-title">
+              <span class="icon-badge">
+                <svg class="icon" aria-hidden="true"><use href="#i-lock"></use></svg>
+              </span>
+              <div>
+                <h2 id="authTitle">Authentication</h2>
+                <p>JWT session and token inspector</p>
+              </div>
+            </div>
+            <span class="pill pill-neutral" id="providerBadge" hidden>JWT</span>
+          </div>
+
+          <div class="segmented" role="tablist" aria-label="Authentication mode">
+            <button
+              class="segmented-button is-active"
+              id="loginTab"
+              type="button"
+              role="tab"
+              aria-selected="true"
+              data-auth-mode="login"
+            >
+              Sign in
+            </button>
+            <button
+              class="segmented-button"
+              id="registerTab"
+              type="button"
+              role="tab"
+              aria-selected="false"
+              data-auth-mode="register"
+            >
+              Register
+            </button>
+          </div>
+
+          <form id="authForm" class="stack" novalidate>
+            <div class="field" id="nameField" hidden>
+              <label for="authName">Name</label>
+              <div class="input-wrap">
+                <svg class="icon input-icon" aria-hidden="true"><use href="#i-user"></use></svg>
+                <input
+                  type="text"
+                  id="authName"
+                  name="name"
+                  placeholder="Ada Lovelace"
+                  autocomplete="name"
+                  minlength="2"
+                  maxlength="80"
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="authEmail">Email</label>
+              <div class="input-wrap">
+                <svg class="icon input-icon" aria-hidden="true"><use href="#i-mail"></use></svg>
+                <input
+                  type="email"
+                  id="authEmail"
+                  name="email"
+                  placeholder="you@ensta.dz"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="authPassword">Password</label>
+              <div class="input-wrap">
+                <svg class="icon input-icon" aria-hidden="true"><use href="#i-key"></use></svg>
+                <input
+                  type="password"
+                  id="authPassword"
+                  name="password"
+                  placeholder="At least 8 characters"
+                  autocomplete="current-password"
+                  required
+                  minlength="8"
+                />
+                <button
+                  class="input-action"
+                  id="passwordToggle"
+                  type="button"
+                  aria-label="Show password"
+                >
+                  <svg class="icon" aria-hidden="true"><use href="#i-eye"></use></svg>
+                </button>
+              </div>
+            </div>
+
+            <button class="button button-primary button-block" id="authSubmit" type="submit">
+              <svg class="icon" aria-hidden="true"><use href="#i-key"></use></svg>
+              <span id="authSubmitLabel">Sign in</span>
+            </button>
+          </form>
+
+          <div class="divider"><span>Session</span></div>
+
+          <div class="session-empty" id="sessionEmpty">
+            <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+            <div>
+              <strong>No token stored</strong>
+              <p>Sign in to obtain a JWT and inspect its payload.</p>
+            </div>
+          </div>
+
+          <div class="session" id="sessionPanel" hidden>
+            <div class="profile">
+              <span class="avatar" id="userAvatar" aria-hidden="true">?</span>
+              <div class="profile-text">
+                <strong id="userName">Unknown user</strong>
+                <span id="userEmail">No email</span>
+              </div>
+              <span class="pill pill-accent" id="sessionProvider">JWT</span>
+            </div>
+
+            <div class="token-meta">
+              <span class="token-preview" id="tokenPreview">No token</span>
+              <span class="token-expiry" id="tokenExpiry">Not verified</span>
+            </div>
+
+            <div class="button-row button-row-compact">
+              <button class="button button-secondary button-sm" id="copyToken" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-copy"></use></svg>
+                Copy
+              </button>
+              <button class="button button-secondary button-sm" id="verifyToken" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+                Verify
+              </button>
+              <button class="button button-ghost button-sm" id="clearSession" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-logout"></use></svg>
+                Clear
+              </button>
+            </div>
+
+            <div class="inspector">
+              <div class="inspector-head">
+                <span>Token inspector</span>
+                <span class="pill pill-neutral" id="tokenTypeBadge">JWT</span>
+              </div>
+              <div class="claims" id="tokenClaims"></div>
+              <details class="code-details" open>
+                <summary>
+                  <span>Decoded sections</span>
+                  <svg class="icon" aria-hidden="true"><use href="#i-code"></use></svg>
+                </summary>
+                <div class="code-grid">
+                  <div class="code-block">
+                    <span>Header</span>
+                    <pre id="jwtHeader">-</pre>
+                  </div>
+                  <div class="code-block">
+                    <span>Payload</span>
+                    <pre id="jwtPayload">-</pre>
+                  </div>
+                </div>
+              </details>
+              <p class="opaque-note" id="opaqueNote" hidden>
+                This is an opaque OAuth2/OIDC access token. Its claims are resolved by the
+                server through the configured validator. Use Verify to inspect the identity.
+              </p>
+            </div>
+          </div>
+
+          <details class="paste-token">
+            <summary>
+              <span>Use an existing or OAuth2 token</span>
+              <svg class="icon" aria-hidden="true"><use href="#i-key"></use></svg>
+            </summary>
+            <div class="field">
+              <label for="tokenInput">Bearer token</label>
+              <textarea
+                id="tokenInput"
+                rows="3"
+                placeholder="Paste a JWT or an opaque OAuth2 access token"
+                spellcheck="false"
+              ></textarea>
+            </div>
+            <button class="button button-secondary button-block" id="useTokenButton" type="button">
+              <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+              Use this token
+            </button>
+          </details>
+
+          <p class="hint">
+            Login is limited to 5 attempts per 15 minutes per IP. The strict limiter is
+            demonstrated in the rate-limit panel below.
+          </p>
+        </section>
+
+        <!-- ------------------------------------------------------------------ -->
+        <!-- Product manager                                                    -->
+        <!-- ------------------------------------------------------------------ -->
+        <section class="card products-card" aria-labelledby="productsTitle">
+          <div class="card-head">
+            <div class="card-title">
+              <span class="icon-badge">
+                <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
+              </span>
+              <div>
+                <h2 id="productsTitle">Products</h2>
+                <p><span id="productCount">0</span> products in the catalogue</p>
+              </div>
+            </div>
+
+            <div class="toolbar">
+              <label class="switch" title="Send the stored token with protected requests">
+                <input type="checkbox" id="bearerToggle" checked />
+                <span class="switch-track" aria-hidden="true"></span>
+                <span class="switch-label">Send Bearer token</span>
+              </label>
+              <button
+                class="icon-button"
+                id="refreshProducts"
+                type="button"
+                aria-label="Refresh product list"
+                title="Refresh product list"
+              >
+                <svg class="icon" aria-hidden="true"><use href="#i-refresh"></use></svg>
+              </button>
+              <button class="button button-primary button-sm" id="newProductButton" type="button">
+                <svg class="icon" aria-hidden="true"><use href="#i-plus"></use></svg>
+                New product
+              </button>
+            </div>
+          </div>
+
+          <div class="product-workspace">
+            <div class="product-list-panel">
+              <div class="search-box">
+                <svg class="icon" aria-hidden="true"><use href="#i-search"></use></svg>
+                <input
+                  type="search"
+                  id="productSearch"
+                  placeholder="Search name, category or description"
+                  aria-label="Search products"
+                />
+              </div>
+              <div class="list-meta">
+                <span id="visibleCount">0 shown</span>
+                <span id="catalogueStatus">Loading</span>
+              </div>
+              <ul class="product-list" id="productList" aria-label="Product catalogue"></ul>
+            </div>
+
+            <div class="product-detail" id="productDetail">
+              <div class="empty-state">
+                <span class="empty-icon">
+                  <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
+                </span>
+                <h3>Select a product</h3>
+                <p>The inspector displays the complete product document returned by the API.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ------------------------------------------------------------------ -->
+        <!-- Rate-limit stress tester                                           -->
+        <!-- ------------------------------------------------------------------ -->
+        <section class="card limits-card" aria-labelledby="limitsTitle">
+          <div class="card-head">
+            <div class="card-title">
+              <span class="icon-badge">
+                <svg class="icon" aria-hidden="true"><use href="#i-gauge"></use></svg>
+              </span>
+              <div>
+                <h2 id="limitsTitle">Rate-limit stress tester</h2>
+                <p>Observe 429 responses and Retry-After headers live</p>
+              </div>
+            </div>
+            <span class="pill pill-warning" id="limitBadge">5 login attempts / 15 min</span>
+          </div>
+
+          <div class="limits-grid">
+            <div class="stress-controls">
+              <p class="section-lede">
+                Sequential requests are sent from this browser. The login target quickly
+                exhausts the strict 5-request limiter. The general target consumes the
+                100-request API budget.
+              </p>
+
+              <div class="control-grid">
+                <div class="field">
+                  <label for="stressTarget">Target</label>
+                  <select id="stressTarget">
+                    <option value="login">POST /api/auth/login (strict)</option>
+                    <option value="general">GET /api/products (general)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label for="stressCount">Requests</label>
+                  <input type="number" id="stressCount" min="1" max="140" value="8" />
+                </div>
+                <div class="field">
+                  <label for="stressDelay">Delay (ms)</label>
+                  <input type="number" id="stressDelay" min="0" max="2000" step="10" value="40" />
+                </div>
+              </div>
+
+              <div class="button-row">
+                <button class="button button-primary" id="startStress" type="button">
+                  <svg class="icon" aria-hidden="true"><use href="#i-play"></use></svg>
+                  <span id="startStressLabel">Start test</span>
+                </button>
+                <button class="button button-secondary" id="resetLimits" type="button">
+                  <svg class="icon" aria-hidden="true"><use href="#i-rotate"></use></svg>
+                  Reset counters
+                </button>
+                <button class="button button-ghost" id="clearStress" type="button">
+                  <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+                  Clear log
+                </button>
+              </div>
+
+              <p class="hint" id="limitHint">
+                Development only: the reset action clears the in-memory counters from the
+                loopback interface.
+              </p>
+            </div>
+
+            <div class="stress-results">
+              <div class="stat-grid">
+                <div class="stat">
+                  <span class="stat-label">Sent</span>
+                  <strong id="statTotal">0</strong>
+                </div>
+                <div class="stat stat-success">
+                  <span class="stat-label">Successful</span>
+                  <strong id="statSuccess">0</strong>
+                </div>
+                <div class="stat stat-warning">
+                  <span class="stat-label">Unauthorized</span>
+                  <strong id="statUnauthorized">0</strong>
+                </div>
+                <div class="stat stat-danger">
+                  <span class="stat-label">Rate limited</span>
+                  <strong id="statLimited">0</strong>
+                </div>
+              </div>
+
+              <div
+                class="progress"
+                role="progressbar"
+                aria-label="Stress test progress"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="0"
+                id="stressProgressBar"
+              >
+                <span id="stressProgress"></span>
+              </div>
+
+              <div class="log-head">
+                <span>Request log</span>
+                <span class="log-status" id="stressStatus">Idle</span>
+              </div>
+              <div class="stress-log" id="stressLog" role="log" aria-live="polite">
+                <div class="log-empty" id="stressLogEmpty">
+                  No requests yet. Start a test to observe HTTP statuses.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <span>ENSTA WAMD &mdash; Web Application Development, TD-TP 3</span>
+        <span>Node.js, Express, MongoDB, JWT, OAuth2, rate limiting</span>
+      </footer>
+    </div>
+
+    <!-- -------------------------------------------------------------------- -->
+    <!-- Product editor modal                                                 -->
+    <!-- -------------------------------------------------------------------- -->
+    <dialog class="modal" id="productDialog" aria-labelledby="productDialogTitle">
+      <form class="modal-card" id="productForm" novalidate>
+        <div class="modal-head">
+          <div class="card-title">
+            <span class="icon-badge">
+              <svg class="icon" aria-hidden="true"><use href="#i-bag"></use></svg>
+            </span>
+            <div>
+              <h3 id="productDialogTitle">New product</h3>
+              <p id="productDialogSubtitle">Create a product through the protected endpoint</p>
+            </div>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            id="closeProductDialog"
+            aria-label="Close product editor"
+          >
+            <svg class="icon" aria-hidden="true"><use href="#i-x"></use></svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="field">
+            <label for="productName">Name</label>
+            <input
+              type="text"
+              id="productName"
+              name="name"
+              placeholder="Aurora Wireless Headphones"
+              required
+              minlength="2"
+              maxlength="120"
+            />
+          </div>
+
+          <div class="field">
+            <label for="productDescription">Description</label>
+            <textarea
+              id="productDescription"
+              name="description"
+              rows="3"
+              maxlength="2000"
+              placeholder="Short product description"
+            ></textarea>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="productPrice">Price (USD)</label>
+              <input
+                type="number"
+                id="productPrice"
+                name="price"
+                min="0"
+                step="0.01"
+                placeholder="249.90"
+                required
+              />
+            </div>
+            <div class="field">
+              <label for="productStock">Stock</label>
+              <input
+                type="number"
+                id="productStock"
+                name="stock"
+                min="0"
+                step="1"
+                placeholder="24"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="productCategory">Category</label>
+              <input
+                type="text"
+                id="productCategory"
+                name="category"
+                maxlength="60"
+                placeholder="Audio"
+              />
+            </div>
+            <div class="field">
+              <label for="productImageUrl">Image URL</label>
+              <input
+                type="url"
+                id="productImageUrl"
+                name="imageUrl"
+                maxlength="500"
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+          </div>
+
+          <div class="form-error" id="productFormError" role="alert" hidden>
+            <svg class="icon" aria-hidden="true"><use href="#i-warning"></use></svg>
+            <span id="productFormErrorText"></span>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <span class="modal-note" id="productAuthNote">
+            <svg class="icon" aria-hidden="true"><use href="#i-shield"></use></svg>
+            Protected request
+          </span>
+          <button class="button button-ghost" type="button" id="cancelProduct">
+            Cancel
+          </button>
+          <button class="button button-primary" type="submit" id="saveProduct">
+            <svg class="icon" aria-hidden="true"><use href="#i-check"></use></svg>
+            <span id="saveProductLabel">Create product</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- -------------------------------------------------------------------- -->
+    <!-- Delete confirmation modal                                            -->
+    <!-- -------------------------------------------------------------------- -->
+    <dialog class="modal modal-small" id="confirmDialog" aria-labelledby="confirmTitle">
+      <div class="modal-card">
+        <div class="confirm-content">
+          <span class="confirm-icon">
+            <svg class="icon" aria-hidden="true"><use href="#i-warning"></use></svg>
+          </span>
+          <h3 id="confirmTitle">Delete this product?</h3>
+          <p id="confirmMessage">
+            This action permanently removes the selected product from the catalogue.
+          </p>
+        </div>
+        <div class="modal-actions modal-actions-centered">
+          <button class="button button-secondary" type="button" id="cancelDelete">
+            Cancel
+          </button>
+          <button class="button button-danger" type="button" id="confirmDelete">
+            <svg class="icon" aria-hidden="true"><use href="#i-trash"></use></svg>
+            Delete product
+          </button>
+        </div>
+      </div>
+    </dialog>
+
+    <div class="toast-host" id="toastHost" aria-live="polite" aria-atomic="false"></div>
+
+    <script src="/app.js" defer></script>
+  </body>
+</html>
