@@ -117,13 +117,22 @@ app.use((_req, res, next) => {
 /* Health and development helpers (excluded from the general limiter)         */
 /* -------------------------------------------------------------------------- */
 
-app.get('/api/health', (_req, res) => {
+app.get('/api/health', async (_req, res) => {
+  let databaseStatus = 'disconnected';
+
+  try {
+    await ensureDatabase();
+    databaseStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+  } catch (_error) {
+    databaseStatus = 'disconnected';
+  }
+
   res.status(200).json({
     status: 'ok',
     service: 'ENSTA WAMD TD-TP 3 E-Commerce API',
     uptime: Math.round(process.uptime()),
     timestamp: new Date().toISOString(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    database: databaseStatus,
     rateLimit: {
       generalMax: rateLimitConfig.generalMax,
       loginMax: rateLimitConfig.loginMax,
