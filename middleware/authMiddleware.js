@@ -49,11 +49,19 @@ async function authenticate(req, res, next) {
 
   if (secret) {
     try {
-      const decoded = jwt.verify(token, secret, {
+      const verifyOptions = {
         algorithms: ['HS256'],
-        issuer: process.env.JWT_ISSUER || undefined,
-        audience: process.env.JWT_AUDIENCE || undefined,
-      });
+      };
+
+      if (process.env.JWT_ISSUER) {
+        verifyOptions.issuer = process.env.JWT_ISSUER;
+      }
+
+      if (process.env.JWT_AUDIENCE) {
+        verifyOptions.audience = process.env.JWT_AUDIENCE;
+      }
+
+      const decoded = jwt.verify(token, secret, verifyOptions);
 
       const id = decoded.sub || decoded.id;
       if (id) {

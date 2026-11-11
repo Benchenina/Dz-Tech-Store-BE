@@ -115,6 +115,19 @@ async function login(req, res, next) {
       throw error;
     }
 
+    const signOptions = {
+      algorithm: 'HS256',
+      expiresIn: process.env.JWT_EXPIRES_IN || '1h',
+    };
+
+    if (process.env.JWT_ISSUER) {
+      signOptions.issuer = process.env.JWT_ISSUER;
+    }
+
+    if (process.env.JWT_AUDIENCE) {
+      signOptions.audience = process.env.JWT_AUDIENCE;
+    }
+
     const token = jwt.sign(
       {
         sub: user._id.toString(),
@@ -122,12 +135,7 @@ async function login(req, res, next) {
         email: user.email,
       },
       secret,
-      {
-        algorithm: 'HS256',
-        expiresIn: process.env.JWT_EXPIRES_IN || '1h',
-        issuer: process.env.JWT_ISSUER || undefined,
-        audience: process.env.JWT_AUDIENCE || undefined,
-      }
+      signOptions
     );
 
     return res.status(200).json({
