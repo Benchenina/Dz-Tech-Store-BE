@@ -17,6 +17,51 @@ const HOST = process.env.HOST || '0.0.0.0';
 const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 
 /* -------------------------------------------------------------------------- */
+/* Serverless-safe database connection                                       */
+/* -------------------------------------------------------------------------- */
+
+let databasePromise = null;
+let seedPromise = null;
+let hasSeeded = false;
+
+async function ensureDatabase() {
+  if (mongoose.connection.readyState !== 1) {
+    if (!databasePromise) {
+      databasePromise = connectDB().finally(() => {
+        databasePromise = null;
+      });
+    }
+
+    await databasePromise;
+  }
+
+  if (!hasSeeded && process.env.AUTO_SEED !== 'false') {
+    if (!seedPromise) {
+      seedPromise = seedIfEmpty({ verbose: false })
+        .then(() => {
+          hasSeeded = true;
+        })
+        .finally(() => {
+          seedPromise = null;
+        });
+    }
+
+    await seedPromise;
+  }
+
+  return mongoose.connection;
+}
+
+async function ensureDatabaseMiddleware(_req, _res, next) {
+  try {
+    await ensureDatabase();
+    next();
+  } catch (error) {
+    next(error);
+  }
+}
+
+/* -------------------------------------------------------------------------- */
 /* Core middleware                                                            */
 /* -------------------------------------------------------------------------- */
 
@@ -114,6 +159,8 @@ if (!IS_PRODUCTION && process.env.DEV_RATE_LIMIT_RESET !== 'false') {
 /* -------------------------------------------------------------------------- */
 
 app.use('/api', apiLimiter);
+app.use('/api/auth', ensureDatabaseMiddleware);
+app.use('/api/products', ensureDatabaseMiddleware);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
@@ -225,11 +272,7 @@ function validateEnvironment() {
 
 async function startServer() {
   validateEnvironment();
-  await connectDB();
-
-  if (process.env.AUTO_SEED !== 'false') {
-    await seedIfEmpty({ verbose: true });
-  }
+  await ensureDatabase();
 
   const server = app.listen(PORT, HOST, () => {
     console.log(`[server] Environment: ${process.env.NODE_ENV || 'development'}`);
@@ -260,4 +303,8 @@ if (require.main === module) {
   });
 }
 
-module.exports = { app, startServer };
+module.exports = app;
+module.exports.app = app;
+module.exports.startServer = startServer;
+module.exports.ensureDatabase = ensureDatabase;
+module.exports.default = app;
